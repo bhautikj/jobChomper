@@ -68,8 +68,6 @@ class TestGraph(unittest.TestCase):
     self.assertTrue(("A", "B", True) in x.edges)
     self.assertTrue(("B", "C", False) in x.edges)
     self.assertTrue(("B", "D", True) in x.edges)
-    
-    
 
 
 if __name__ == '__main__':

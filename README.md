@@ -1,5 +1,7 @@
 # jobFlinger
 
+python -m unittest
+
 Need to periodically run: pip freeze > requirements.txt
 
 On install: pip install -r requirements.txt
