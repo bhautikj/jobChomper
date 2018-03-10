@@ -1,5 +1,5 @@
 ## 
-## Weirdo DAG that powers jobFlinger
+## Weirdo Tree Graph that powers jobFlinger
 ## --
 ##
 ## Assertions: 
@@ -14,16 +14,50 @@
 ##     A, B, True
 ##
 
+
+STARTNODENAME = "STARTNODE"
+
+def findCycle(graph):
+  todo = set(graph.keys())
+  while todo:
+    node = todo.pop()
+    stack = [node]
+    while stack:
+      top = stack[-1]
+      for node in graph[top]:
+        if node in stack:
+          return stack[stack.index(node):]
+        if node in todo:
+          stack.append(node)
+          todo.remove(node)
+          break
+      else:
+        node = stack.pop()
+  return None
+
+    
 class Graph(object):
   """ Graph Object """
-  edges = set()
-  init = False
   
   def __init__(self):
     self.init = True
+    self.edges = set()
     
+
+  def findCycles(self):
+    testDict = {}
+    for edge in self.edges:
+      nodeA = edge[0]
+      nodeB = edge[1]
+      if nodeA not in testDict.keys():
+        testDict[nodeA] = []
+      testDict[nodeA].append(nodeB)
     
+    return findCycle(testDict)    
+  
   def loadGraphFromFile(self, filename):
+    foundStart = False
+    
     with open(filename) as graphBody:
       data = graphBody.read()
       for line in data.split('\n'):
@@ -39,17 +73,27 @@ class Graph(object):
         
         # Not a triple
         if len(spl) != 3:
-          raise ValueError("Problem parsing: " + filename + " file has invalid triple: " + line)
+          raise ValueError("[Graph] Problem parsing: " + filename + " file has invalid triple: " + line)
         
-        nodeA = spl[0]
-        nodeB = spl[1]
+        nodeA = spl[0].strip()
+        nodeB = spl[1].strip()
         prevEval = False
-        if spl[2].lower() == 'true':
+        if spl[2].lower().strip() == 'true':
           prevEval = True
+      
+        if nodeA == STARTNODENAME:
+          if foundStart == True:
+            raise ValueError("[Graph] Problem parsing: " + filename + " start node defined again: " + line)
+          else:
+            foundStart = True
       
         triple = (nodeA, nodeB, prevEval)
         
         self.edges.add(triple)
+
+    if foundStart == False:   
+      raise ValueError("[Graph] Problem parsing: " + filename + " cound not find " + STARTNODENAME)
       
-      
-    return True
+    cycles = self.findCycles()
+    if cycles != None:
+      raise ValueError("[Graph] Problem parsing: " + filename + " cycle detected:" + str(cycles))
