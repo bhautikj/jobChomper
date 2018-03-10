@@ -3,9 +3,38 @@ testdir = os.path.dirname(__file__)
 import unittest
 
 import jobFlinger.graph
+import jobFlinger.node
+
+class TestGraph(unittest.TestCase):  
+  class A(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def run(self):
+      return True
+
+  class B(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def run(self):
+      return True
+
+  class C(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def run(self):
+      return True
+
+  class D(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def run(self):
+      return True
 
 
-class TestGraph(unittest.TestCase):
   def test_init(self):
     xa = jobFlinger.graph.Graph()
     self.assertTrue(xa.init)
@@ -25,6 +54,10 @@ class TestGraph(unittest.TestCase):
   def test_read_cycleGraphFile(self):
     xe = jobFlinger.graph.Graph()
     self.assertRaises(ValueError, xe.loadGraphFromFile, os.path.join(testdir,"cycleGraph.graph"))
+
+  def test_read_nonexistnodeGraphFile(self):
+    xe = jobFlinger.graph.Graph()
+    self.assertRaises(ValueError, xe.loadGraphFromFile, os.path.join(testdir,"nonexistnodeGraph.graph"))
     
   def test_read_validFile(self):
     x = jobFlinger.graph.Graph()
@@ -35,6 +68,8 @@ class TestGraph(unittest.TestCase):
     self.assertTrue(("A", "B", True) in x.edges)
     self.assertTrue(("B", "C", False) in x.edges)
     self.assertTrue(("B", "D", True) in x.edges)
+    
+    
 
 
 if __name__ == '__main__':

@@ -13,7 +13,7 @@
 ##   * Elements in graph lines separated by ',' - for example:
 ##     A, B, True
 ##
-
+import jobFlinger.node
 
 STARTNODENAME = "STARTNODE"
 
@@ -35,7 +35,7 @@ def findCycle(graph):
         node = stack.pop()
   return None
 
-    
+
 class Graph(object):
   """ Graph Object """
   
@@ -97,3 +97,18 @@ class Graph(object):
     cycles = self.findCycles()
     if cycles != None:
       raise ValueError("[Graph] Problem parsing: " + filename + " cycle detected:" + str(cycles))
+      
+      
+    for edge in self.edges:
+      nodeA = edge[0]
+      nodeB = edge[1]
+      
+      if nodeA == STARTNODENAME:
+        continue
+
+      if not jobFlinger.node.nodeExists(nodeA):
+        raise ValueError("[Graph] no such node as: " + nodeA)
+
+      if not jobFlinger.node.nodeExists(nodeB):
+        raise ValueError("[Graph] no such node as: " + nodeB)
+      
