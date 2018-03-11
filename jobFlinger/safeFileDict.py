@@ -15,6 +15,7 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
 
   def writeJournal(self):
     if self.doJournal == False:
+      # TODO: log!
       return
 
     with self.lock:
@@ -23,27 +24,28 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
         file.write(data)
 
   def readJournal(self, journalFile=""):
-    with self.lock:
-      if journalFile == "" and self.doJournal == False:
-        return
-      
-      if journalFile != "":
-        toRead = journalFile
-      else:
-        toRead = self.journalFile
-      
-      with open(toRead, 'r') as file:
-        self = json.loads(file.read())
+    if journalFile == "" and self.doJournal == False:
+      # TODO: log!
+      return
+    
+    if journalFile != "":
+      toRead = journalFile
+    else:
+      toRead = self.journalFile
+    
+    with open(toRead, 'r') as file:
+      self.clear()
+      self.update(json.loads(file.read()))
         
   def __getitem__(self, key):
     with self.lock:
       val = dict.__getitem__(self, key)
-      print ('GET', key)
+      # print ('GET', key)
       return val
 
   def __setitem__(self, key, val):
     with self.lock:
-      print ('SET', key, val)
+      # print ('SET', key, val)
       dict.__setitem__(self, key, val)
 
   def __repr__(self):
@@ -52,7 +54,6 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
       return '%s(%s)' % (type(self).__name__, dictrepr)
 
   def update(self, *args, **kwargs):
-    with self.lock:
-      print ('update', args, kwargs)
-      for k, v in dict(*args, **kwargs).items():
-        self[k] = v
+    # print ('update', args, kwargs)
+    for k, v in dict(*args, **kwargs).items():
+      self[k] = v
