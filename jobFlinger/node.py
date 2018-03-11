@@ -13,18 +13,18 @@ class Node(object):
     self.runOnSuccess = []
     self.runOnFailure = []
 
-  def work(self):
+  def work(self, params):
     raise ValueError("[Node] can't run node base class")
 
-  def run(self):
-    return self.work()
+  def run(self, params):
+    return self.work(params)
     
 
 class StartNode(Node):
   def __init__(self):
     super().__init__()
 
-  def work(self):
+  def work(self, params):
     return True
       
 def nodeExists(nodeName):

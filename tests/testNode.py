@@ -9,16 +9,16 @@ class TestNode(unittest.TestCase):
     def __init__(self):
       super().__init__()
   
-    def work(self):
+    def work(self, params):
       return True
       
   def test_run_node(self):
     nodeFail = jobFlinger.node.Node()
-    self.assertRaises(ValueError,  nodeFail.run)
+    self.assertRaises(ValueError,  nodeFail.run, {})
 
   def test_run_start_node(self):
     startnode = jobFlinger.node.StartNode()
-    self.assertTrue(startnode.run())
+    self.assertTrue(startnode.run({}))
 
   def test_node_exists(self):
     self.assertTrue(jobFlinger.node.nodeExists("NODEA"))
@@ -29,7 +29,7 @@ class TestNode(unittest.TestCase):
       def __init__(self):
         super().__init__()
   
-      def work(self):
+      def work(self, params):
         return True
     
     na = jobFlinger.node.createNodeByName("NODEC")
