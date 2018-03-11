@@ -24,12 +24,12 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
 
   def readJournal(self, journalFile=""):
     with self.lock:
-      if journalFile == "" && self.doJournal == False:
+      if journalFile == "" and self.doJournal == False:
         return
       
       if journalFile != "":
         toRead = journalFile
-      else
+      else:
         toRead = self.journalFile
       
       with open(toRead, 'r') as file:
