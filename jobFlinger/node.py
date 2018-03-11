@@ -1,18 +1,30 @@
+import time
+
+currentMilliTime = lambda: int(round(time.time() * 1000))
+
+sixtyMilliseconds = 1000 * 60
+
 class Node(object):
   """ Node Object """
-  def __init__(self):
+  def __init__(self, timeout = sixtyMilliseconds, maxRetries = 5 ):
     self.init = True
+    self.timeout = timeout
+    self.maxRetries = maxRetries
     self.runOnSuccess = []
     self.runOnFailure = []
 
-  def run(self):
+  def work(self):
     raise ValueError("[Node] can't run node base class")
+
+  def run(self):
+    return self.work()
     
+
 class StartNode(Node):
   def __init__(self):
     super().__init__()
 
-  def run(self):
+  def work(self):
     return True
       
 def nodeExists(nodeName):

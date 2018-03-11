@@ -10,28 +10,28 @@ class TestGraph(unittest.TestCase):
     def __init__(self):
       super().__init__()
   
-    def run(self):
+    def work(self):
       return True
 
   class B(jobFlinger.node.Node):
     def __init__(self):
       super().__init__()
   
-    def run(self):
+    def work(self):
       return True
 
   class C(jobFlinger.node.Node):
     def __init__(self):
       super().__init__()
   
-    def run(self):
+    def work(self):
       return True
 
   class D(jobFlinger.node.Node):
     def __init__(self):
       super().__init__()
   
-    def run(self):
+    def work(self):
       return True
 
 

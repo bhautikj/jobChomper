@@ -54,6 +54,21 @@ class Graph(object):
       testDict[nodeA].append(nodeB)
     
     return findCycle(testDict)    
+
+  def checkEdgeNodesValid(self):
+    for edge in self.edges:
+      nodeA = edge[0]
+      nodeB = edge[1]
+      
+      if nodeA == STARTNODENAME:
+        continue
+
+      if not jobFlinger.node.nodeExists(nodeA):
+        raise ValueError("[Graph] no such node as: " + nodeA)
+
+      if not jobFlinger.node.nodeExists(nodeB):
+        raise ValueError("[Graph] no such node as: " + nodeB)
+
   
   def loadGraphFromFile(self, filename):
     foundStart = False
@@ -98,17 +113,5 @@ class Graph(object):
     if cycles != None:
       raise ValueError("[Graph] Problem parsing: " + filename + " cycle detected:" + str(cycles))
       
-      
-    for edge in self.edges:
-      nodeA = edge[0]
-      nodeB = edge[1]
-      
-      if nodeA == STARTNODENAME:
-        continue
-
-      if not jobFlinger.node.nodeExists(nodeA):
-        raise ValueError("[Graph] no such node as: " + nodeA)
-
-      if not jobFlinger.node.nodeExists(nodeB):
-        raise ValueError("[Graph] no such node as: " + nodeB)
+    self.checkEdgeNodesValid()
       
