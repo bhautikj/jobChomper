@@ -42,18 +42,19 @@ class Graph(object):
   def __init__(self):
     self.init = True
     self.edges = set()
-    
+    self.runDict = {}
 
-  def findCycles(self):
-    testDict = {}
+  def buildRunDict(self):
+    self.runDict = {}
     for edge in self.edges:
       nodeA = edge[0]
       nodeB = edge[1]
-      if nodeA not in testDict.keys():
-        testDict[nodeA] = []
-      testDict[nodeA].append(nodeB)
-    
-    return findCycle(testDict)    
+      if nodeA not in self.runDict.keys():
+        self.runDict[nodeA] = []
+      self.runDict[nodeA].append(nodeB)
+          
+  def findCycles(self):
+    return findCycle(self.runDict)    
 
   def checkEdgeNodesValid(self):
     for edge in self.edges:
@@ -109,9 +110,12 @@ class Graph(object):
     if foundStart == False:   
       raise ValueError("[Graph] Problem parsing: " + filename + " cound not find " + STARTNODENAME)
       
+    self.buildRunDict()
+    
     cycles = self.findCycles()
     if cycles != None:
       raise ValueError("[Graph] Problem parsing: " + filename + " cycle detected:" + str(cycles))
       
-    self.checkEdgeNodesValid()
+    self.checkEdgeNodesValid()      
       
+    
