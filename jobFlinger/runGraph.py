@@ -50,8 +50,6 @@ class RunGraph(object):
         self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY,
                                              "numAttempts" : 0,
                                              "runs": []}
-                                             
-    print(self.state[JOBPROGRESSKEY])
 
   def run(self):
     print("x")
