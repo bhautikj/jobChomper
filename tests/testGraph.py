@@ -68,7 +68,12 @@ class TestGraph(unittest.TestCase):
     self.assertTrue(("A", "B", True) in x.edges)
     self.assertTrue(("B", "C", False) in x.edges)
     self.assertTrue(("B", "D", True) in x.edges)
-
+    
+    self.assertTrue(jobFlinger.graph.STARTNODENAME in x.nodeSet)
+    self.assertTrue("A" in x.nodeSet)
+    self.assertTrue("B" in x.nodeSet)
+    self.assertTrue("C" in x.nodeSet)
+    self.assertTrue("D" in x.nodeSet)
 
 if __name__ == '__main__':
   unittest.main()

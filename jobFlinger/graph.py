@@ -45,12 +45,15 @@ class Graph(object):
     self.init = True
     self.edges = set()
     self.runDict = {}
+    self.nodeSet = set()
 
   def buildRunDict(self):
     self.runDict = {}
     for edge in self.edges:
       nodeA = edge[0]
       nodeB = edge[1]
+      self.nodeSet.add(nodeA)
+      self.nodeSet.add(nodeB)
       priorSuccess = edge[2]
       if nodeA not in self.runDict.keys():
         self.runDict[nodeA] = {}

@@ -46,9 +46,12 @@ class RunGraph(object):
   def initJobProgress(self):
     if JOBPROGRESSKEY not in self.state.keys():
       self.state[JOBPROGRESSKEY] = {}
-      for node in self.graph.runDict.keys():
+      for node in self.graph.nodeSet:
         self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY,
                                              "numAttempts" : 0,
                                              "runs": []}
+                                             
+    print(self.state[JOBPROGRESSKEY])
+
   def run(self):
     print("x")
