@@ -16,6 +16,8 @@
 import jobFlinger.node
 
 STARTNODENAME = "STARTNODE"
+ONSUCCESS = "onSuccess"
+ONCOMPLETE = "onComplete"
 
 def findCycle(graph):
   todo = set(graph.keys())
@@ -49,12 +51,27 @@ class Graph(object):
     for edge in self.edges:
       nodeA = edge[0]
       nodeB = edge[1]
+      priorSuccess = edge[2]
       if nodeA not in self.runDict.keys():
-        self.runDict[nodeA] = []
-      self.runDict[nodeA].append(nodeB)
-          
+        self.runDict[nodeA] = {}
+        self.runDict[nodeA][ONSUCCESS]=[]
+        self.runDict[nodeA][ONCOMPLETE]=[]
+      
+      if priorSuccess == True:
+        self.runDict[nodeA][ONSUCCESS].append(nodeB)
+      else:
+        self.runDict[nodeA][ONCOMPLETE].append(nodeB)
+
   def findCycles(self):
-    return findCycle(self.runDict)    
+    connectivity = {}
+    for edge in self.edges:
+      nodeA = edge[0]
+      nodeB = edge[1]
+      if nodeA not in connectivity.keys():
+        connectivity[nodeA] = []
+      connectivity[nodeA].append(nodeB)
+      
+    return findCycle(connectivity)    
 
   def checkEdgeNodesValid(self):
     for edge in self.edges:

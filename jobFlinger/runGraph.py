@@ -9,7 +9,7 @@ JOBSTATEFILE = "state.json"
 GRAPHFILEKEY = "graphFile"
 JOBPROGRESSKEY = "progress"
 
-NOTSTARTEDKEY = "notStarted"
+PENDINGKEY = "pending"
 INPROGRESSKEY = "inProgress"
 FAILEDKEY = "failed"
 DONEKEY = "done"
@@ -37,9 +37,7 @@ class RunGraph(object):
     
     # check job progress
     self.initJobProgress()
-    
-    # walk over graph, schedule next job
-    
+        
   def createGraph(self):
     graphfile = os.path.join(self.jobDir, self.state[GRAPHFILEKEY])
     self.graph = jobFlinger.graph.Graph()
@@ -49,7 +47,8 @@ class RunGraph(object):
     if JOBPROGRESSKEY not in self.state.keys():
       self.state[JOBPROGRESSKEY] = {}
       for node in self.graph.runDict.keys():
-        self.state[JOBPROGRESSKEY][node] = { "status" : NOTSTARTEDKEY,
+        self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY,
                                              "numAttempts" : 0,
                                              "runs": []}
-    
+  def run(self):
+    print("x")
