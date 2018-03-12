@@ -26,13 +26,13 @@ class DirectoryWrangler(object):
     os.mkdir(jobDir)
     return jobID
     
-  def getJobVar(self, jobID):
+  def getVar(self, jobID):
     return os.path.join(self.varDir, jobID)
 
-  def getJobTmp(self, jobID):
+  def getTmp(self, jobID):
     return os.path.join(self.tmpDir, jobID)
 
-  def getJobDone(self, jobID):
+  def getDone(self, jobID):
     return os.path.join(self.doneDir, jobID)
  
   def getActiveJobs(self):
