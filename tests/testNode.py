@@ -3,6 +3,7 @@ testdir = os.path.dirname(__file__)
 import unittest
 
 import jobFlinger.node
+import jobFlinger.safeFileDict
 
 class TestNode(unittest.TestCase):  
   class NODEA(jobFlinger.node.Node):
@@ -14,11 +15,21 @@ class TestNode(unittest.TestCase):
       
   def test_run_node(self):
     nodeFail = jobFlinger.node.Node()
-    self.assertRaises(ValueError,  nodeFail.work, {})
+    stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                  jobFlinger.node.JOBPROGRESSKEY: {
+                    jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.PENDINGKEY},
+                    "NODEA" : { "status" : jobFlinger.node.PENDINGKEY}
+                  } }
+    self.assertRaises(ValueError,  nodeFail.work, jobFlinger.safeFileDict.SafeFileDict(stateDict))
 
   def test_run_start_node(self):
     startnode = jobFlinger.node.StartNode()
-    self.assertTrue(startnode.run({}))
+    stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                  jobFlinger.node.JOBPROGRESSKEY: {
+                    jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.PENDINGKEY},
+                    "NODEA" : { "status" : jobFlinger.node.PENDINGKEY}
+                  } }
+    self.assertTrue(startnode.run(jobFlinger.safeFileDict.SafeFileDict(stateDict)))
 
   def test_node_exists(self):
     self.assertTrue(jobFlinger.node.nodeExists("NODEA"))
