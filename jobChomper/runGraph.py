@@ -1,7 +1,7 @@
-import jobFlinger.graph
-import jobFlinger.node
-import jobFlinger.safeFileDict
-import jobFlinger.directoryWrangler
+import jobChomper.graph
+import jobChomper.node
+import jobChomper.safeFileDict
+import jobChomper.directoryWrangler
 
 import os, json
 #from concurrent.futures import ThreadPoolExecutor, wait, as_completed
@@ -16,12 +16,12 @@ import inspect
 
 def runNode(namedNode, state):
 
-  if not jobFlinger.node.nodeExists(namedNode):
+  if not jobChomper.node.nodeExists(namedNode):
     print("NO NODE: ", namedNode)
-    state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"]  = jobFlinger.node.FAILEDKEY
+    state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
     state.writeJournal()
     
-  node = jobFlinger.node.createNodeByName(namedNode)
+  node = jobChomper.node.createNodeByName(namedNode)
 
   results = {}
   
@@ -36,14 +36,14 @@ def runNode(namedNode, state):
       
 
     if success == True:
-      # print("\n", namedNode, state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"])
-      state[jobFlinger.node.JOBPROGRESSKEY][namedNode][jobFlinger.node.TIMESTARTKEY] = jobFlinger.node.currentMilliTime()
-      state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"] = jobFlinger.node.DONEKEY
-      state[jobFlinger.node.JOBPROGRESSKEY][namedNode][jobFlinger.node.TIMEENDKEY] = jobFlinger.node.currentMilliTime()
+      # print("\n", namedNode, state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"])
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMESTARTKEY] = jobChomper.node.currentMilliTime()
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"] = jobChomper.node.DONEKEY
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMEENDKEY] = jobChomper.node.currentMilliTime()
       state.writeJournal()
 
   if success == False:
-    state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"]  = jobFlinger.node.FAILEDKEY
+    state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
     state.writeJournal()
 
   return success
@@ -64,7 +64,7 @@ class RunGraph(object):
       raise ValueError("[RunGraph] state file for " + self.jobID + " missing")
       
     with open(statefile) as statedict:
-      self.state = jobFlinger.safeFileDict.SafeFileDict(json.loads(statedict.read()))
+      self.state = jobChomper.safeFileDict.SafeFileDict(json.loads(statedict.read()))
       self.state.enableJournal(statefile)
 
     # get graph from state
@@ -75,46 +75,46 @@ class RunGraph(object):
         
   def createGraph(self):
     graphfile = os.path.join(self.jobDir, self.state[GRAPHFILEKEY])
-    self.graph = jobFlinger.graph.Graph()
+    self.graph = jobChomper.graph.Graph()
     self.graph.loadGraphFromFile(graphfile)
     
   def initJobProgress(self):
-    if jobFlinger.node.JOBPROGRESSKEY not in self.state.keys():
-      self.state[jobFlinger.node.JOBPROGRESSKEY] = {}
+    if jobChomper.node.JOBPROGRESSKEY not in self.state.keys():
+      self.state[jobChomper.node.JOBPROGRESSKEY] = {}
       for node in self.graph.nodeSet:
-        self.state[jobFlinger.node.JOBPROGRESSKEY][node] = { "status" : jobFlinger.node.PENDINGKEY }
+        self.state[jobChomper.node.JOBPROGRESSKEY][node] = {"status" : jobChomper.node.PENDINGKEY}
       self.state.writeJournal()
 
   def needsToRun(self, nodeName, rerunFailed):
     if rerunFailed:
-      testSet = [jobFlinger.node.PENDINGKEY, jobFlinger.node.INPROGRESSKEY, jobFlinger.node.FAILEDKEY]
+      testSet = [jobChomper.node.PENDINGKEY, jobChomper.node.INPROGRESSKEY, jobChomper.node.FAILEDKEY]
     else:
-      testSet = [jobFlinger.node.PENDINGKEY, jobFlinger.node.INPROGRESSKEY]
-    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
+      testSet = [jobChomper.node.PENDINGKEY, jobChomper.node.INPROGRESSKEY]
+    return self.state[jobChomper.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
 
   def isDone(self, nodeName, rerunFailed):
     if rerunFailed:
-      testSet = [jobFlinger.node.DONEKEY]
+      testSet = [jobChomper.node.DONEKEY]
     else:
-      testSet = [jobFlinger.node.FAILEDKEY, jobFlinger.node.DONEKEY]
-    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
+      testSet = [jobChomper.node.FAILEDKEY, jobChomper.node.DONEKEY]
+    return self.state[jobChomper.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
 
   def isFailed(self, nodeName):
-    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in [jobFlinger.node.FAILEDKEY]
+    return self.state[jobChomper.node.JOBPROGRESSKEY][nodeName]["status"] in [jobChomper.node.FAILEDKEY]
     
   def graphWalk(self, rerunFailed):
-    # traverse graph & create sets - done (jobFlinger.node.FAILEDKEY, jobFlinger.node.DONEKEY) and 
-    # pending (jobFlinger.node.INPROGRESSKEY, jobFlinger.node.PENDINGKEY). In-progress jobs get 
+    # traverse graph & create sets - done (jobChomper.node.FAILEDKEY, jobChomper.node.DONEKEY) and
+    # pending (jobChomper.node.INPROGRESSKEY, jobChomper.node.PENDINGKEY). In-progress jobs get
     # restarted on a reload; can force a rerun of failed nodes if
     # param rerunFailed == True
     runQueue = set()
         
     # start with STARTNODENAME
-    if self.needsToRun(jobFlinger.graph.STARTNODENAME, rerunFailed):
-      runQueue.add(jobFlinger.graph.STARTNODENAME)
+    if self.needsToRun(jobChomper.graph.STARTNODENAME, rerunFailed):
+      runQueue.add(jobChomper.graph.STARTNODENAME)
       return runQueue
     
-    checkNodes = set([jobFlinger.graph.STARTNODENAME])
+    checkNodes = set([jobChomper.graph.STARTNODENAME])
     
     while len(checkNodes) != 0:
       checkCopy = set(checkNodes)
@@ -124,16 +124,16 @@ class RunGraph(object):
         if self.isDone(node, rerunFailed):
           if self.isFailed(node):
             # only run on fail children
-            for child in self.graph.runDict[node][jobFlinger.graph.RUNONFAIL]:
+            for child in self.graph.runDict[node][jobChomper.graph.RUNONFAIL]:
               #print("\nNode failed, adding child ", child)
               checkNodes.add(child)
           else:
             # run all children
-            for child in self.graph.runDict[node][jobFlinger.graph.RUNONFAIL]:
+            for child in self.graph.runDict[node][jobChomper.graph.RUNONFAIL]:
               #print("\nNode passed, adding on fail child ", child)
               checkNodes.add(child)
 
-            for child in self.graph.runDict[node][jobFlinger.graph.RUNONLYONPASS]:
+            for child in self.graph.runDict[node][jobChomper.graph.RUNONLYONPASS]:
               #print("\nNode passed, adding on pass child ", child)
               checkNodes.add(child)
         else:

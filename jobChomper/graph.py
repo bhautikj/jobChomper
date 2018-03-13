@@ -1,5 +1,5 @@
 ## 
-## Weirdo Tree Graph that powers jobFlinger
+## Weirdo Tree Graph that powers jobChomper
 ## --
 ##
 ## Assertions: 
@@ -13,7 +13,7 @@
 ##   * Elements in graph lines separated by ',' - for example:
 ##     A, B, True
 ##
-import jobFlinger.node
+import jobChomper.node
 
 STARTNODENAME = "STARTNODE"
 RUNONLYONPASS = "onlyOnPass"
@@ -90,10 +90,10 @@ class Graph(object):
       if nodeA == STARTNODENAME:
         continue
 
-      if not jobFlinger.node.nodeExists(nodeA):
+      if not jobChomper.node.nodeExists(nodeA):
         raise ValueError("[Graph] no such node as: " + nodeA)
 
-      if not jobFlinger.node.nodeExists(nodeB):
+      if not jobChomper.node.nodeExists(nodeB):
         raise ValueError("[Graph] no such node as: " + nodeB)
 
   

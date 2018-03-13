@@ -4,8 +4,8 @@ import unittest
 import shutil
 import uuid
 
-import jobFlinger.directoryWrangler
-import jobFlinger.runGraph
+import jobChomper.directoryWrangler
+import jobChomper.runGraph
 
 def touch(fname):
     open(fname, 'a').close()
@@ -29,13 +29,13 @@ class TestDirectoryWrangler(unittest.TestCase):
     testBase, testTmp, testVar, testDone = createTestBase()
         
     try:
-      w = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      w = jobChomper.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
       jobA = w.createJob()
       self.assertTrue(os.path.isdir(os.path.join(testVar, jobA)))
-      touch(os.path.join(testVar, jobA, jobFlinger.runGraph.JOBSTATEFILE))
+      touch(os.path.join(testVar, jobA, jobChomper.runGraph.JOBSTATEFILE))
       jobB = w.createJob()
       self.assertTrue(os.path.isdir(os.path.join(testVar, jobB)))
-      touch(os.path.join(testVar, jobB, jobFlinger.runGraph.JOBSTATEFILE))
+      touch(os.path.join(testVar, jobB, jobChomper.runGraph.JOBSTATEFILE))
       
       jobs = set(w.getActiveJobs())
       ejobs = set([jobA, jobB])

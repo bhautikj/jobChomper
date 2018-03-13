@@ -1,9 +1,9 @@
 import os, uuid
 
-import jobFlinger.runGraph
+import jobChomper.runGraph
 
 #
-# For jobFlinger we need:
+# For jobChomper we need:
 #  A) a var dir - jobs in progress live here and can survive application failure
 #  B) a tmp dir - somewhere to store tmp data; ephemeral data that can be lost
 #  C) a done dir - somewhere to move jobs after they are done
@@ -40,7 +40,7 @@ class DirectoryWrangler(object):
     subfolders = [f.path for f in os.scandir(self.varDir) if f.is_dir()]
 
     # only get the dirs with JOBSTATEFILE
-    subfolders = [f for f in subfolders if os.path.exists(os.path.join(f, jobFlinger.runGraph.JOBSTATEFILE))]
+    subfolders = [f for f in subfolders if os.path.exists(os.path.join(f, jobChomper.runGraph.JOBSTATEFILE))]
 
     # remove dot files
     subfolders = [os.path.basename(f) for f in subfolders if f[0] != '.']
