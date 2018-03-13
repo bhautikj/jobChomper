@@ -33,16 +33,17 @@ def runNode(namedNode, state):
 
   for i in range(node.maxRetries):
     if success == False:
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMESTARTKEY] = jobChomper.node.currentMilliTime()
       success = node.work(state)
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMEENDKEY] = jobChomper.node.currentMilliTime()
       
 
     if success == True:
-      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMESTARTKEY] = jobChomper.node.currentMilliTime()
       state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"] = jobChomper.node.DONEKEY
-      state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMEENDKEY] = jobChomper.node.currentMilliTime()
-      state[jobChomper.node.JOBPROGRESSKEY][namedNode][NUMTRIESKEY] = str(i+1)    
       state.writeJournal()
       break
+
+  state[jobChomper.node.JOBPROGRESSKEY][namedNode][NUMTRIESKEY] = str(i+1)    
 
   if success == False:
     state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
