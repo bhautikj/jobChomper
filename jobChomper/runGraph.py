@@ -11,6 +11,7 @@ POOLSIZE = 5
 
 JOBSTATEFILE = "state.json"
 GRAPHFILEKEY = "graphFile"
+NUMTRIESKEY = "numTries"
 
 import inspect
 
@@ -36,11 +37,12 @@ def runNode(namedNode, state):
       
 
     if success == True:
-      # print("\n", namedNode, state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"])
       state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMESTARTKEY] = jobChomper.node.currentMilliTime()
       state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"] = jobChomper.node.DONEKEY
       state[jobChomper.node.JOBPROGRESSKEY][namedNode][jobChomper.node.TIMEENDKEY] = jobChomper.node.currentMilliTime()
+      state[jobChomper.node.JOBPROGRESSKEY][namedNode][NUMTRIESKEY] = str(i+1)    
       state.writeJournal()
+      break
 
   if success == False:
     state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
