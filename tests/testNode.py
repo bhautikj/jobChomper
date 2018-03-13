@@ -14,7 +14,7 @@ class TestNode(unittest.TestCase):
       
   def test_run_node(self):
     nodeFail = jobFlinger.node.Node()
-    self.assertRaises(ValueError,  nodeFail.run, {})
+    self.assertRaises(ValueError,  nodeFail.work, {})
 
   def test_run_start_node(self):
     startnode = jobFlinger.node.StartNode()

@@ -4,6 +4,10 @@ import jobFlinger.safeFileDict
 import jobFlinger.directoryWrangler
 
 import os, json
+#from concurrent.futures import ThreadPoolExecutor, wait, as_completed
+import concurrent.futures
+
+POOLSIZE = 5
 
 JOBSTATEFILE = "state.json"
 GRAPHFILEKEY = "graphFile"
@@ -14,8 +18,13 @@ INPROGRESSKEY = "inProgress"
 FAILEDKEY = "failed"
 DONEKEY = "done"
 
+def runNode(namedNode, state):
+  node = jobFlinger.node.createNodeByName(namedNode)
+  node.run(state)
 
 class RunGraph(object):
+  poolExecutors = concurrent.futures.ThreadPoolExecutor(POOLSIZE)
+  
   """ RunGraph Object """
   def __init__(self, directoryWrangler, jobID):
     self.directoryWrangler = directoryWrangler
@@ -47,9 +56,8 @@ class RunGraph(object):
     if JOBPROGRESSKEY not in self.state.keys():
       self.state[JOBPROGRESSKEY] = {}
       for node in self.graph.nodeSet:
-        self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY,
-                                             "numAttempts" : 0,
-                                             "runs": []}
+        self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY }
+      self.state.writeJournal()
 
   def needsToRun(self, nodeName, rerunFailed):
     if rerunFailed:
@@ -106,4 +114,14 @@ class RunGraph(object):
           runQueue.add(node)
     
     return runQueue
+    
+  def graphRun(self, rerunFailed):
+    # state is self.state
+    runQueue = self.graphWalk(rerunFailed)
+    while len(runQueue) != 0:
+      futures = []
+      for nodeName in runQueue:
+        futures.append(self.poolExecutors.submit(runNode, nodeName, self.state))
+      results = concurrent.futures.wait(futures)
+    
     
