@@ -10,8 +10,6 @@ class Node(object):
     self.init = True
     self.timeout = timeout
     self.maxRetries = maxRetries
-    self.runOnSuccess = []
-    self.runOnFailure = []
 
   def work(self, params):
     raise ValueError("[Node] can't run node base class")

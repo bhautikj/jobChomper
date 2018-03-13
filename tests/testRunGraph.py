@@ -65,5 +65,258 @@ class TestRunGraph(unittest.TestCase):
         filewrite.write(graphData)
         
       runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      
+    finally:
+      shutil.rmtree(testBase)
+      
+  def test_graph_statedict_written(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "A" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, TRUE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set([jobFlinger.graph.STARTNODENAME])
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+      
+  def test_graph_startnode_run(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set(["A"])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+      
+  def test_graph_startnode_run_A(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set(["B","C"])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+
+  def test_graph_startnode_run_A_failed(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set(["C"])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+      
+  def test_graph_startnode_finished_with_failed(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set([])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+
+  def test_graph_startnode_finished_with_force_rerunFailed(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(True)
+      runInTheory = set(["A"])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
+    finally:
+      shutil.rmtree(testBase)
+      
+  def test_graph_startnode_finished_(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.runGraph.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "A" : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "B" : { "status" : jobFlinger.runGraph.DONEKEY},
+                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    } }
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      with open(stateDictFile, 'w') as filewrite:
+        filewrite.write(json.dumps(stateDict))
+      
+      graphData  = "STARTNODE, A, FALSE\n"
+      graphData += "A, B, TRUE\n"
+      graphData += "A, C, FALSE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set([])
+      
+      #print ("\n",toRun, runInTheory)
+            
+      self.assertTrue(toRun == runInTheory)
     finally:
       shutil.rmtree(testBase)
