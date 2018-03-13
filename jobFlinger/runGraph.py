@@ -11,12 +11,6 @@ POOLSIZE = 5
 
 JOBSTATEFILE = "state.json"
 GRAPHFILEKEY = "graphFile"
-JOBPROGRESSKEY = "progress"
-
-PENDINGKEY = "pending"
-INPROGRESSKEY = "inProgress"
-FAILEDKEY = "failed"
-DONEKEY = "done"
 
 def runNode(namedNode, state):
   node = jobFlinger.node.createNodeByName(namedNode)
@@ -53,32 +47,32 @@ class RunGraph(object):
     self.graph.loadGraphFromFile(graphfile)
     
   def initJobProgress(self):
-    if JOBPROGRESSKEY not in self.state.keys():
-      self.state[JOBPROGRESSKEY] = {}
+    if jobFlinger.node.JOBPROGRESSKEY not in self.state.keys():
+      self.state[jobFlinger.node.JOBPROGRESSKEY] = {}
       for node in self.graph.nodeSet:
-        self.state[JOBPROGRESSKEY][node] = { "status" : PENDINGKEY }
+        self.state[jobFlinger.node.JOBPROGRESSKEY][node] = { "status" : jobFlinger.node.PENDINGKEY }
       self.state.writeJournal()
 
   def needsToRun(self, nodeName, rerunFailed):
     if rerunFailed:
-      testSet = [PENDINGKEY, INPROGRESSKEY, FAILEDKEY]
+      testSet = [jobFlinger.node.PENDINGKEY, jobFlinger.node.INPROGRESSKEY, jobFlinger.node.FAILEDKEY]
     else:
-      testSet = [PENDINGKEY, INPROGRESSKEY]
-    return self.state[JOBPROGRESSKEY][nodeName]["status"] in testSet
+      testSet = [jobFlinger.node.PENDINGKEY, jobFlinger.node.INPROGRESSKEY]
+    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
 
   def isDone(self, nodeName, rerunFailed):
     if rerunFailed:
-      testSet = [DONEKEY]
+      testSet = [jobFlinger.node.DONEKEY]
     else:
-      testSet = [FAILEDKEY, DONEKEY]
-    return self.state[JOBPROGRESSKEY][nodeName]["status"] in testSet
+      testSet = [jobFlinger.node.FAILEDKEY, jobFlinger.node.DONEKEY]
+    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in testSet
 
   def isFailed(self, nodeName):
-    return self.state[JOBPROGRESSKEY][nodeName]["status"] in [FAILEDKEY]
+    return self.state[jobFlinger.node.JOBPROGRESSKEY][nodeName]["status"] in [jobFlinger.node.FAILEDKEY]
     
   def graphWalk(self, rerunFailed):
-    # traverse graph & create sets - done (FAILEDKEY, DONEKEY) and 
-    # pending (INPROGRESSKEY, PENDINGKEY). In-progress jobs get 
+    # traverse graph & create sets - done (jobFlinger.node.FAILEDKEY, jobFlinger.node.DONEKEY) and 
+    # pending (jobFlinger.node.INPROGRESSKEY, jobFlinger.node.PENDINGKEY). In-progress jobs get 
     # restarted on a reload; can force a rerun of failed nodes if
     # param rerunFailed == True
     runQueue = set()

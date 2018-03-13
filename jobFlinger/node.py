@@ -1,7 +1,12 @@
 import time
 
-currentMilliTime = lambda: int(round(time.time() * 1000))
+JOBPROGRESSKEY = "progress"
+PENDINGKEY = "pending"
+INPROGRESSKEY = "inProgress"
+FAILEDKEY = "failed"
+DONEKEY = "done"
 
+currentMilliTime = lambda: int(round(time.time() * 1000))
 sixtySeconds = 1000 * 60
 
 class Node(object):

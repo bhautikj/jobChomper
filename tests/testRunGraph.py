@@ -78,11 +78,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "A" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.PENDINGKEY},
+                      "A" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.PENDINGKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -112,11 +112,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.PENDINGKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -148,11 +148,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.DONEKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.PENDINGKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -184,11 +184,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.PENDINGKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.PENDINGKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -220,11 +220,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.DONEKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -256,11 +256,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.FAILEDKEY},
-                      "B" : { "status" : jobFlinger.runGraph.PENDINGKEY},
-                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.FAILEDKEY},
+                      "B" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "C" : { "status" : jobFlinger.node.DONEKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
@@ -292,11 +292,11 @@ class TestRunGraph(unittest.TestCase):
       jobID = directoryWrangler.createJob()
       jobDirectory = directoryWrangler.getVar(jobID)
       stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
-                    jobFlinger.runGraph.JOBPROGRESSKEY: {
-                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "A" : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "B" : { "status" : jobFlinger.runGraph.DONEKEY},
-                      "C" : { "status" : jobFlinger.runGraph.DONEKEY}
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.DONEKEY},
+                      "A" : { "status" : jobFlinger.node.DONEKEY},
+                      "B" : { "status" : jobFlinger.node.DONEKEY},
+                      "C" : { "status" : jobFlinger.node.DONEKEY}
                     } }
       stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
       with open(stateDictFile, 'w') as filewrite:
