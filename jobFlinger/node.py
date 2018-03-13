@@ -21,33 +21,11 @@ class Node(object):
   def work(self, params):
     raise ValueError("[Node] can't run node base class")
 
-  def run(self, params):
-    success = False
-    
-    timeStart = 0
-    timeEnd = 0
 
-    for i in range(self.maxRetries):
-      if success == False:
-        success = self.work(params)
-      
-      if success == True:
-        params[TIMESTARTKEY] = currentMilliTime()
-        params[JOBPROGRESSKEY][self.nodeName] = DONEKEY
-        params[TIMEENDKEY] = currentMilliTime()
-        params.writeJournal()
-    
-    if success == False:
-      params[JOBPROGRESSKEY][self.nodeName] = FAILEDKEY
-      params.writeJournal()
-    
-    return success
-
-
-class StartNode(Node):
+class STARTNODE(Node):
   def __init__(self):
     super().__init__()
-    self.nodeName = "StartNode"
+    self.nodeName = "STARTNODE"
 
   def work(self, params):
     return True

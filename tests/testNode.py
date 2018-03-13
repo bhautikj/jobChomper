@@ -23,13 +23,13 @@ class TestNode(unittest.TestCase):
     self.assertRaises(ValueError,  nodeFail.work, jobFlinger.safeFileDict.SafeFileDict(stateDict))
 
   def test_run_start_node(self):
-    startnode = jobFlinger.node.StartNode()
+    startnode = jobFlinger.node.STARTNODE()
     stateDict = { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
                   jobFlinger.node.JOBPROGRESSKEY: {
                     jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.PENDINGKEY},
                     "NODEA" : { "status" : jobFlinger.node.PENDINGKEY}
                   } }
-    self.assertTrue(startnode.run(jobFlinger.safeFileDict.SafeFileDict(stateDict)))
+    self.assertTrue(startnode.work(jobFlinger.safeFileDict.SafeFileDict(stateDict)))
 
   def test_node_exists(self):
     self.assertTrue(jobFlinger.node.nodeExists("NODEA"))

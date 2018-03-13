@@ -320,3 +320,77 @@ class TestRunGraph(unittest.TestCase):
       self.assertTrue(toRun == runInTheory)
     finally:
       shutil.rmtree(testBase)
+
+class TestRunGraphClasses(unittest.TestCase):      
+  class rA(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def work(self, params):
+      if "bin" not in params.keys():
+        params["bin"] = []
+      params["bin"].append("rA")
+      return True
+
+  class rB(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def work(self, params):
+      if "bin" not in params.keys():
+        params["bin"] = []
+      params["bin"].append("rB")
+      return True
+
+  class rC(jobFlinger.node.Node):
+    def __init__(self):
+      super().__init__()
+  
+    def work(self, params):
+      if "bin" not in params.keys():
+        params["bin"] = []
+      params["bin"].append("rC")
+      return True
+  
+  
+  def test_graph_startnode_finished_(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobFlinger.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = jobFlinger.safeFileDict.SafeFileDict (
+                  { jobFlinger.runGraph.GRAPHFILEKEY : "test.graph",
+                    jobFlinger.node.JOBPROGRESSKEY: {
+                      jobFlinger.graph.STARTNODENAME : { "status" : jobFlinger.node.PENDINGKEY},
+                      "rA" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "rB" : { "status" : jobFlinger.node.PENDINGKEY},
+                      "rC" : { "status" : jobFlinger.node.PENDINGKEY}
+                    } })
+      stateDictFile = os.path.join(jobDirectory, jobFlinger.runGraph.JOBSTATEFILE)
+      stateDict.enableJournal(stateDictFile)
+      stateDict.writeJournal()
+      
+      graphData  = "STARTNODE, rA, FALSE\n"
+      graphData += "rA, rB, TRUE\n"
+      graphData += "rA, rC, TRUE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobFlinger.runGraph.RunGraph(directoryWrangler, jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      runInTheory = set([jobFlinger.graph.STARTNODENAME])
+            
+      self.assertTrue(toRun == runInTheory)
+      
+      runGraph.graphRun(False)
+      
+      self.assertTrue('rA' in runGraph.state['bin'])
+      self.assertTrue('rB' in runGraph.state['bin'])
+      self.assertTrue('rC' in runGraph.state['bin'])
+
+    finally:
+      shutil.rmtree(testBase)

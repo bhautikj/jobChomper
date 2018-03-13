@@ -12,10 +12,42 @@ POOLSIZE = 5
 JOBSTATEFILE = "state.json"
 GRAPHFILEKEY = "graphFile"
 
-def runNode(namedNode, state):
-  node = jobFlinger.node.createNodeByName(namedNode)
-  node.run(state)
+import inspect
 
+def runNode(namedNode, state):
+
+  if not jobFlinger.node.nodeExists(namedNode):
+    print("NO NODE: ", namedNode)
+    state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"]  = jobFlinger.node.FAILEDKEY
+    state.writeJournal()
+    
+  node = jobFlinger.node.createNodeByName(namedNode)
+
+  results = {}
+  
+  success = False
+
+  timeStart = 0
+  timeEnd = 0
+
+  for i in range(node.maxRetries):
+    if success == False:
+      success = node.work(state)
+      
+
+    if success == True:
+      # print("\n", namedNode, state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"])
+      state[jobFlinger.node.JOBPROGRESSKEY][namedNode][jobFlinger.node.TIMESTARTKEY] = jobFlinger.node.currentMilliTime()
+      state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"] = jobFlinger.node.DONEKEY
+      state[jobFlinger.node.JOBPROGRESSKEY][namedNode][jobFlinger.node.TIMEENDKEY] = jobFlinger.node.currentMilliTime()
+      state.writeJournal()
+
+  if success == False:
+    state[jobFlinger.node.JOBPROGRESSKEY][namedNode]["status"]  = jobFlinger.node.FAILEDKEY
+    state.writeJournal()
+
+  return success
+  
 class RunGraph(object):
   poolExecutors = concurrent.futures.ThreadPoolExecutor(POOLSIZE)
   
@@ -111,11 +143,19 @@ class RunGraph(object):
     
   def graphRun(self, rerunFailed):
     # state is self.state
-    runQueue = self.graphWalk(rerunFailed)
+    runQueue = list(self.graphWalk(rerunFailed))
     while len(runQueue) != 0:
       futures = []
       for nodeName in runQueue:
         futures.append(self.poolExecutors.submit(runNode, nodeName, self.state))
-      results = concurrent.futures.wait(futures)
+      done, not_done = concurrent.futures.wait(futures)
+      
+      # iterate over futures - it'll throw exceptions from the runs as needed
+      for job in done:
+        result = job.result()
+      
+      # TODO: more sophisticated handling of the not_done set to mark those jobs
+      # as failed.            
+      runQueue = self.graphWalk(rerunFailed)
     
     
