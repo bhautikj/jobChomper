@@ -58,15 +58,15 @@ class RunGraph(object):
     self.directoryWrangler = directoryWrangler
     self.jobID = jobID
     self.jobDir = self.directoryWrangler.getVar(self.jobID)
-    self.loadState()
+    #self.loadState()
   
   def initFromGraph(self, graphFile):
     if not os.path.isfile(graphFile):
       raise ValueError("[RunGraph] no such graph file " + graphFile)
 
     graphBase = os.path.basename(graphFile)  
-    jobDirectory = directoryWrangler.getVar(self.jobID)
-    shutil.copyFile(graphFile, os.path.join(jobDirectory, graphBase))
+    jobDirectory = self.directoryWrangler.getVar(self.jobID)
+    shutil.copyfile(graphFile, os.path.join(jobDirectory, graphBase))
     
     statefile = os.path.join(self.jobDir, JOBSTATEFILE)
     tmpState = jobChomper.safeFileDict.SafeFileDict({jobChomper.runGraph.GRAPHFILEKEY : graphBase})
