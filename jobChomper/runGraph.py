@@ -3,8 +3,7 @@ import jobChomper.node
 import jobChomper.safeFileDict
 import jobChomper.directoryWrangler
 
-import os, json
-#from concurrent.futures import ThreadPoolExecutor, wait, as_completed
+import os, json, shutil
 import concurrent.futures
 
 POOLSIZE = 5
@@ -59,6 +58,21 @@ class RunGraph(object):
     self.directoryWrangler = directoryWrangler
     self.jobID = jobID
     self.jobDir = self.directoryWrangler.getVar(self.jobID)
+    self.loadState()
+  
+  def initFromGraph(self, graphFile):
+    if not os.path.isfile(graphFile):
+      raise ValueError("[RunGraph] no such graph file " + graphFile)
+
+    graphBase = os.path.basename(graphFile)  
+    jobDirectory = directoryWrangler.getVar(self.jobID)
+    shutil.copyFile(graphFile, os.path.join(jobDirectory, graphBase))
+    
+    statefile = os.path.join(self.jobDir, JOBSTATEFILE)
+    tmpState = jobChomper.safeFileDict.SafeFileDict({jobChomper.runGraph.GRAPHFILEKEY : graphBase})
+    tmpState.enableJournal(statefile)
+    tmpState.writeJournal()
+    
     self.loadState()
   
   def loadState(self):
