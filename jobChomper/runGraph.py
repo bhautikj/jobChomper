@@ -177,7 +177,7 @@ class RunGraph(object):
     while len(runQueue) != 0:
       futures = []
       for nodeName in runQueue:
-        futures.append(self.poolExecutors.submit(runNode, nodeName, self.state))
+        futures.append(RunGraph.poolExecutors.submit(runNode, nodeName, self.state))
       done, not_done = concurrent.futures.wait(futures)
       
       # iterate over futures - it'll throw exceptions from the runs as needed
@@ -188,5 +188,7 @@ class RunGraph(object):
       # as failed.            
       runQueue = self.graphWalk(rerunFailed)
       logging.info("Pending jobs: " + str(runQueue))
+      
+    return self.state
     
     

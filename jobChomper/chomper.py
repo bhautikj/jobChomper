@@ -2,10 +2,13 @@ import logging
 import logging.handlers
 import os
 
+import concurrent.futures
+
 import jobChomper.directoryWrangler
 import jobChomper.runGraph
 
 LOGFILE = "chomper.log"
+POOLSIZE = 5
 
 def createWorkDirs(workingDirectory):
   testTmp = os.path.join(workingDirectory, "tmp")
@@ -20,8 +23,11 @@ def createWorkDirs(workingDirectory):
   return testTmp, testVar, testDone, testLog
   
 class Chomper(object):  
+  chomperPool = concurrent.futures.ThreadPoolExecutor(POOLSIZE)
+  
   """ RunGraph Object """
   def __init__(self, workingDirectory, numWorkers = 5):
+    chomperPool = concurrent.futures.ThreadPoolExecutor(numWorkers)
     self.workingDirectory = workingDirectory
     self.workTmp, self.workVar, self.workDone, self.logDir = createWorkDirs(self.workingDirectory)
     self.directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(self.workVar, self.workTmp, self.workDone)
@@ -31,14 +37,29 @@ class Chomper(object):
     handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=100*1024*1024, backupCount=10)
     logging.getLogger('').addHandler(handler)
     
+    self.running = []
+    
   def createJob(self):
     return self.directoryWrangler.createJob()
     
   def getJobPath(self, jobID):
     return self.directoryWrangler.getVar(jobID)
-    
+
   def runGraph(self, jobID, graphFile, restartFailed = False):
     runGraph = jobChomper.runGraph.RunGraph(self.directoryWrangler)
-    runGraph.initFromGraph(graphFile, jobID)          
-    runGraph.graphRun(restartFailed)
-    return runGraph.state
+    runGraph.initFromGraph(graphFile, jobID)     
+    self.running.append(self.chomperPool.submit(runGraph.graphRun, restartFailed))     
+    #runGraph.graphRun(restartFailed)
+    #return runGraph.state
+    
+  def waitForComplete(self):
+    done, not_done = concurrent.futures.wait(self.running)
+    #print(done, not_done)
+    
+    results = []
+    
+    for job in done:
+      results.append(job.result())
+      
+    return results
+    

@@ -513,7 +513,6 @@ class TestRunGraphClasses(unittest.TestCase):
       self.assertTrue('rA' in runGraph.state['bin'])
       self.assertTrue('rB' in runGraph.state['bin'])
       self.assertTrue('rC' in runGraph.state['bin'])
-
     finally:
       shutil.rmtree(testBase)
       
