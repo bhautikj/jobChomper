@@ -15,7 +15,7 @@ class TestChomper(unittest.TestCase):
       super().__init__()
   
     def work(self, params):
-      time.sleep(0.5)
+      time.sleep(5)
       if "bin" not in params.keys():
         params["bin"] = []
       params["bin"].append("cA")
@@ -26,7 +26,7 @@ class TestChomper(unittest.TestCase):
       super().__init__()
   
     def work(self, params):
-      time.sleep(0.5)
+      time.sleep(5)
       if "bin" not in params.keys():
         params["bin"] = []
       params["bin"].append("cB")
@@ -37,7 +37,7 @@ class TestChomper(unittest.TestCase):
       super().__init__()
   
     def work(self, params):
-      time.sleep(0.5)
+      time.sleep(5)
       if "bin" not in params.keys():
         params["bin"] = []
       params["bin"].append("cC")
