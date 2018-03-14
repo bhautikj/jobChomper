@@ -59,8 +59,9 @@ class RunGraph(object):
   poolExecutors = concurrent.futures.ThreadPoolExecutor(POOLSIZE)
   
   """ RunGraph Object """
-  def __init__(self, directoryWrangler):
+  def __init__(self, directoryWrangler, jobPoolSize = POOLSIZE):
     self.directoryWrangler = directoryWrangler
+    poolExecutors = concurrent.futures.ThreadPoolExecutor(jobPoolSize)
 
   def initFromGraph(self, graphFile, jobID):
     if not os.path.isfile(graphFile):

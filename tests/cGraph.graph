@@ -1,0 +1,3 @@
+STARTNODE, cA, FALSE
+cA, cB, TRUE
+cA, cC, TRUE
