@@ -1,5 +1,6 @@
 import threading
 import json
+import logging
 
 # see https://stackoverflow.com/a/2390997
 class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional first argument
@@ -10,22 +11,25 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
     self.journalFile = ""
 
   def enableJournal(self, journalFile):
+     logging.info("Writing dict to: " + journalFile)
      self.journalFile = journalFile
      self.doJournal = True
 
   def writeJournal(self):
     if self.doJournal == False:
-      # TODO: log!
+      logging.warning("Attempting to write Safe File Dict but no journal file specified.")
       return
 
     with self.lock:
       data = json.dumps (self, indent=2)
       with open(self.journalFile, 'w') as file:
         file.write(data)
+        logging.debug("Wrote dict to: " + self.journalFile)
+        
 
   def readJournal(self, journalFile=""):
     if journalFile == "" and self.doJournal == False:
-      # TODO: log!
+      logging.warning("No journal file specified.")
       return
     
     if journalFile != "":
@@ -36,6 +40,7 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
     with open(toRead, 'r') as file:
       self.clear()
       self.update(json.loads(file.read()))
+      logging.info("Read dict from: " + toRead)
         
   def __getitem__(self, key):
     with self.lock:

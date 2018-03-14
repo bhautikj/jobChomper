@@ -1,4 +1,5 @@
 import os, uuid
+import logging
 
 import jobChomper.runGraph
 
@@ -19,6 +20,9 @@ class DirectoryWrangler(object):
     self.varDir = os.path.abspath(varDir)
     self.tmpDir = os.path.abspath(tmpDir)
     self.doneDir = os.path.abspath(doneDir)
+    logging.info("Directory wrangler initialized - var:" + self.varDir)
+    logging.info("Directory wrangler initialized - tmp:" + self.tmpDir)
+    logging.info("Directory wrangler initialized - done:" + self.doneDir)
   
   def createJob(self):
     jobID = str(uuid.uuid4())

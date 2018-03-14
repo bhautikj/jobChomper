@@ -4,6 +4,7 @@ import jobChomper.safeFileDict
 import jobChomper.directoryWrangler
 
 import os, json, shutil
+import logging
 import concurrent.futures
 
 POOLSIZE = 5
@@ -15,9 +16,9 @@ NUMTRIESKEY = "numTries"
 import inspect
 
 def runNode(namedNode, state):
-
+  logging.info("Running node: " + namedNode)
   if not jobChomper.node.nodeExists(namedNode):
-    print("NO NODE: ", namedNode)
+    logging.warn("No node " + namedNode + " marking as failed in graph")
     state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
     state.writeJournal()
     
@@ -38,6 +39,7 @@ def runNode(namedNode, state):
       
 
     if success == True:
+      logging.info("Node: " + namedNode + " suceeeded after " + str(i+1) + " retries")
       state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"] = jobChomper.node.DONEKEY
       state.writeJournal()
       break
@@ -45,8 +47,11 @@ def runNode(namedNode, state):
   state[jobChomper.node.JOBPROGRESSKEY][namedNode][NUMTRIESKEY] = str(i+1)    
 
   if success == False:
+    logging.warn("Node: " + namedNode + " failed after " + str(i+1) + " retries")
     state[jobChomper.node.JOBPROGRESSKEY][namedNode]["status"]  = jobChomper.node.FAILEDKEY
     state.writeJournal()
+
+  logging.info("Completed node: " + namedNode + " with exit state " + str(success))
 
   return success
   
@@ -59,6 +64,7 @@ class RunGraph(object):
 
   def initFromGraph(self, graphFile, jobID):
     if not os.path.isfile(graphFile):
+      logging.error("No such graph file " + graphFile)
       raise ValueError("[RunGraph] no such graph file " + graphFile)
 
     self.jobID = jobID
@@ -73,6 +79,7 @@ class RunGraph(object):
     tmpState.enableJournal(statefile)
     tmpState.writeJournal()
     
+    logging.info("Created job " + self.jobID + " from graph: " + graphFile)
     self.initFromState(self.jobID)
   
   def initFromState(self, jobID):
@@ -81,6 +88,7 @@ class RunGraph(object):
 
     statefile = os.path.join(self.jobDir, JOBSTATEFILE)
     if not os.path.exists(statefile):
+      logging.error("State file for " + self.jobID + " missing")
       raise ValueError("[RunGraph] state file for " + self.jobID + " missing")
       
     with open(statefile) as statedict:
@@ -164,6 +172,7 @@ class RunGraph(object):
   def graphRun(self, rerunFailed):
     # state is self.state
     runQueue = list(self.graphWalk(rerunFailed))
+    logging.info("Pending jobs: " + str(runQueue))
     while len(runQueue) != 0:
       futures = []
       for nodeName in runQueue:
@@ -177,5 +186,6 @@ class RunGraph(object):
       # TODO: more sophisticated handling of the not_done set to mark those jobs
       # as failed.            
       runQueue = self.graphWalk(rerunFailed)
+      logging.info("Pending jobs: " + str(runQueue))
     
     

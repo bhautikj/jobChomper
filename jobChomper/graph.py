@@ -14,6 +14,7 @@
 ##     A, B, True
 ##
 import jobChomper.node
+import logging
 
 STARTNODENAME = "STARTNODE"
 RUNONLYONPASS = "onlyOnPass"
@@ -115,6 +116,7 @@ class Graph(object):
         
         # Not a triple
         if len(spl) != 3:
+          logging.error("Problem parsing: " + filename + " file has invalid triple: " + line)
           raise ValueError("[Graph] Problem parsing: " + filename + " file has invalid triple: " + line)
         
         nodeA = spl[0].strip()
@@ -125,6 +127,7 @@ class Graph(object):
       
         if nodeA == STARTNODENAME:
           if foundStart == True:
+            logging.error("Problem parsing: " + filename + " start node defined again: " + line)
             raise ValueError("[Graph] Problem parsing: " + filename + " start node defined again: " + line)
           else:
             foundStart = True
@@ -133,13 +136,15 @@ class Graph(object):
         
         self.edges.add(triple)
 
-    if foundStart == False:   
+    if foundStart == False:
+      logging.error("Problem parsing: " + filename + " cound not find " + STARTNODENAME)
       raise ValueError("[Graph] Problem parsing: " + filename + " cound not find " + STARTNODENAME)
       
     self.buildRunDict()
     
     cycles = self.findCycles()
     if cycles != None:
+      logging.error("Problem parsing: " + filename + " cycle detected:" + str(cycles))
       raise ValueError("[Graph] Problem parsing: " + filename + " cycle detected:" + str(cycles))
       
     self.checkEdgeNodesValid()      

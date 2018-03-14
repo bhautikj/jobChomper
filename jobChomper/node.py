@@ -1,4 +1,5 @@
 import time
+import logging
 
 JOBPROGRESSKEY = "progress"
 PENDINGKEY = "pending"
@@ -19,6 +20,7 @@ class Node(object):
     self.maxRetries = maxRetries
 
   def work(self, params):
+    logging.error("Attempting to run work function in abstract base class.")
     raise ValueError("[Node] can't run node base class")
 
 
@@ -34,6 +36,8 @@ def nodeExists(nodeName):
   for clss in Node.__subclasses__():
     if clss.__name__ == nodeName:
       return True
+      
+  logging.debug("Count not find node: " + nodeName)
   return False
   
 def createNodeByName(nodeName):
@@ -41,6 +45,8 @@ def createNodeByName(nodeName):
     if clss.__name__ == nodeName:
       x = clss()
       x.nodeName = nodeName
+      logging.debug("Created node of type " + nodeName)
       return x
 
+  logging.error("Can't find node of type " + nodeName)
   raise ValueError("[Node] can't find node of type: " + nodeName)
