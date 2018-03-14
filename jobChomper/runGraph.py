@@ -54,15 +54,15 @@ class RunGraph(object):
   poolExecutors = concurrent.futures.ThreadPoolExecutor(POOLSIZE)
   
   """ RunGraph Object """
-  def __init__(self, directoryWrangler, jobID):
+  def __init__(self, directoryWrangler):
     self.directoryWrangler = directoryWrangler
-    self.jobID = jobID
-    self.jobDir = self.directoryWrangler.getVar(self.jobID)
-    #self.loadState()
-  
-  def initFromGraph(self, graphFile):
+
+  def initFromGraph(self, graphFile, jobID):
     if not os.path.isfile(graphFile):
       raise ValueError("[RunGraph] no such graph file " + graphFile)
+
+    self.jobID = jobID
+    self.jobDir = self.directoryWrangler.getVar(self.jobID)
 
     graphBase = os.path.basename(graphFile)  
     jobDirectory = self.directoryWrangler.getVar(self.jobID)
@@ -73,9 +73,12 @@ class RunGraph(object):
     tmpState.enableJournal(statefile)
     tmpState.writeJournal()
     
-    self.loadState()
+    self.initFromState(self.jobID)
   
-  def loadState(self):
+  def initFromState(self, jobID):
+    self.jobID = jobID
+    self.jobDir = self.directoryWrangler.getVar(self.jobID)
+
     statefile = os.path.join(self.jobDir, JOBSTATEFILE)
     if not os.path.exists(statefile):
       raise ValueError("[RunGraph] state file for " + self.jobID + " missing")

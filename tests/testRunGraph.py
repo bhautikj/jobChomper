@@ -67,8 +67,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       
@@ -100,8 +100,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([jobChomper.graph.STARTNODENAME])
@@ -135,8 +135,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set(["A"])
@@ -172,8 +172,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set(["B","C"])
@@ -209,8 +209,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set(["C"])
@@ -246,8 +246,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([])
@@ -283,8 +283,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(True)
       runInTheory = set(["A"])
@@ -320,8 +320,8 @@ class TestRunGraph(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([])
@@ -431,8 +431,8 @@ class TestRunGraphClasses(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([jobChomper.graph.STARTNODENAME])
@@ -475,8 +475,8 @@ class TestRunGraphClasses(unittest.TestCase):
       with open(graphFile, 'w') as filewrite:
         filewrite.write(graphData)
         
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.loadState()
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([jobChomper.graph.STARTNODENAME])
@@ -500,10 +500,8 @@ class TestRunGraphClasses(unittest.TestCase):
     try:
       directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
       jobID = directoryWrangler.createJob()
-      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-      runGraph.initFromGraph(os.path.join(testdir, 'rGraph.graph'))
-      runGraph.loadState()
-      
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromGraph(os.path.join(testdir, 'rGraph.graph'), jobID)      
       
       toRun = runGraph.graphWalk(False)
       runInTheory = set([jobChomper.graph.STARTNODENAME])
