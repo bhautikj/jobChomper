@@ -22,32 +22,6 @@ def createTestBase():
   return testBase, testTmp, testVar, testDone
 
 class TestRunGraph(unittest.TestCase):
-  # def test_nostate(self):
-  #   testBase, testTmp, testVar, testDone = createTestBase()
-  #   try:
-  #     directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
-  #     jobID = directoryWrangler.createJob()
-  #     runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-  #     self.assertRaises(ValueError, runGraph.loadState())
-  #   finally:
-  #     shutil.rmtree(testBase)
-  #
-  # def test_nograph(self):
-  #   testBase, testTmp, testVar, testDone = createTestBase()
-  #   try:
-  #     directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
-  #     jobID = directoryWrangler.createJob()
-  #     jobDirectory = directoryWrangler.getVar(jobID)
-  #     stateDict = {jobChomper.runGraph.GRAPHFILEKEY : "test.graph"}
-  #     stateDictFile = os.path.join(jobDirectory, jobChomper.runGraph.JOBSTATEFILE)
-  #     with open(stateDictFile, 'w') as statedictwrite:
-  #       statedictwrite.write(json.dumps(stateDict))
-  #
-  #     runGraph = jobChomper.runGraph.RunGraph(directoryWrangler, jobID)
-  #     self.assertRaises(FileNotFoundError, runGraph.loadState())
-  #   finally:
-  #     shutil.rmtree(testBase)
-      
   def test_graph(self):
     testBase, testTmp, testVar, testDone = createTestBase()
     try:
