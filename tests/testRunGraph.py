@@ -447,7 +447,47 @@ class TestRunGraphClasses(unittest.TestCase):
 
     finally:
       shutil.rmtree(testBase)
+
+  def test_graph_startnode_finished_restartPartialAndFailed(self):
+    testBase, testTmp, testVar, testDone = createTestBase()
+    try:
+      directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(testVar, testTmp, testDone)
+      jobID = directoryWrangler.createJob()
+      jobDirectory = directoryWrangler.getVar(jobID)
+      stateDict = jobChomper.safeFileDict.SafeFileDict (
+                  {jobChomper.runGraph.GRAPHFILEKEY : "test.graph",
+                   jobChomper.node.JOBPROGRESSKEY: {
+                      jobChomper.graph.STARTNODENAME : {"status" : jobChomper.node.DONEKEY},
+                      "rA" : { "status" : jobChomper.node.INPROGRESSKEY},
+                      "rB" : { "status" : jobChomper.node.INPROGRESSKEY},
+                      "rC" : { "status" : jobChomper.node.FAILEDKEY}
+                    }})
+      stateDictFile = os.path.join(jobDirectory, jobChomper.runGraph.JOBSTATEFILE)
+      stateDict.enableJournal(stateDictFile)
+      stateDict.writeJournal()
       
+      graphData  = "STARTNODE, rA, FALSE\n"
+      graphData += "rA, rB, TRUE\n"
+      graphData += "rA, rC, TRUE\n"
+      
+      graphFile = os.path.join(jobDirectory, "test.graph")
+      with open(graphFile, 'w') as filewrite:
+        filewrite.write(graphData)
+        
+      runGraph = jobChomper.runGraph.RunGraph(directoryWrangler)
+      runGraph.initFromState(jobID)
+      
+      toRun = runGraph.graphWalk(False)
+      
+      runGraph.graphRun(True)
+      
+      self.assertTrue('rA' in runGraph.state['bin'])
+      self.assertTrue('rB' in runGraph.state['bin'])
+      self.assertTrue('rC' in runGraph.state['bin'])
+
+    finally:
+      shutil.rmtree(testBase)      
+
       
   def test_graph_startnode_finished_randomFail(self):
     testBase, testTmp, testVar, testDone = createTestBase()
