@@ -1,5 +1,8 @@
 # jobChomper
 
+[![Build 
+Status](https://travis-ci.org/bhautikj/jobChomper.svg?branch=master)](https://travis-ci.org/bhautikj/jobChomper)
+
 ## Preamble
 
 `jobChomper` is a colection of frequently-used routines I use for running a graph of commands in parallel. Typically this is used for, say, processing a large number of images. `jobChomper` is robust, and can pick up and finish executing partially run graphs. It's a bit of a dumping ground for stuff I do all the time, so at the moment I'll suggest that it's still a work-in-progress.
