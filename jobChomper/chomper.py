@@ -33,8 +33,10 @@ class Chomper(object):
     self.directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(self.workVar, self.workTmp, self.workDone)
     
     logfile = os.path.join(self.logDir, LOGFILE)
-    logging.basicConfig(format='%(asctime)s %(message)s', filename=logfile, level=logging.INFO)
+    logformat = '%(asctime)s %(message)s'
+    logging.basicConfig(format=logformat, filename=logfile, level=logging.INFO)
     handler = logging.handlers.RotatingFileHandler(logfile, maxBytes=100*1024*1024, backupCount=10)
+    handler.setFormatter(logging.Formatter(logformat))
     logging.getLogger('').addHandler(handler)
     
     self.running = []
