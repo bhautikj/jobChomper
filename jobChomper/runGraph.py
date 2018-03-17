@@ -76,7 +76,12 @@ class RunGraph(object):
     shutil.copyfile(graphFile, os.path.join(jobDirectory, graphBase))
     
     statefile = os.path.join(self.jobDir, JOBSTATEFILE)
-    tmpState = jobChomper.safeFileDict.SafeFileDict({jobChomper.runGraph.GRAPHFILEKEY : graphBase})
+    statedict = {}
+    if os.path.exists(statefile):
+      with open(statefile, 'r') as fl:
+        statedict = json.loads(fl.read())
+    statedict[jobChomper.runGraph.GRAPHFILEKEY] = graphBase
+    tmpState = jobChomper.safeFileDict.SafeFileDict(statedict)
     tmpState.enableJournal(statefile)
     tmpState.writeJournal()
     
