@@ -91,3 +91,38 @@ class TestChomper(unittest.TestCase):
       self.assertTrue('cC' in state['bin'])
     finally:
       shutil.rmtree(testBase)
+      
+  def chomperManyCallback(self, jobids):
+    self.calledBack = True
+    
+  def test_chomperMany(self):
+    testBase = os.path.join(testdir, str(uuid.uuid4()))
+    try:
+      chomper = jobChomper.chomper.Chomper(testBase, numWorkers=5)
+
+      jobIDs = []
+      for i in range(10):
+        jobID = chomper.createJob()
+        graphfile = os.path.join(testdir, 'cGraph.graph')
+        chomper.runGraph(jobID, graphfile)
+        jobIDs.append(jobID)
+
+      self.calledBack = False
+      
+      chomper.addCompletedCallback(jobIDs, self.chomperManyCallback)
+
+      counter = 0
+      while(chomper.isRunning(jobIDs)):
+        time.sleep(0.1)
+        counter += 1
+        if counter>1000:
+          self.assertTrue(False)
+      
+      state = chomper.doneSet[jobID]
+      self.assertTrue('cA' in state['bin'])
+      self.assertTrue('cB' in state['bin'])
+      self.assertTrue('cC' in state['bin'])
+      
+      self.assertTrue(self.calledBack)
+    finally:
+      shutil.rmtree(testBase)

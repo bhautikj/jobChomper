@@ -36,6 +36,9 @@ class Chomper(object):
     
     # when completed, moved to done set
     self.doneSet = {}
+    
+    # map jobID's to callbacks
+    self.watchedJobs = {}
 
   def configureLogger(self):
     import logging
@@ -59,12 +62,30 @@ class Chomper(object):
     
     jobID = self.runningSet[future]
     self.doneSet[jobID] = future.result()
+    del self.runningSet[future]
+    
+    doneJobs = self.doneSet.keys()
     
     # move job to done
     self.doneSet[jobID].disableJournal()
     jobdir = self.directoryWrangler.getVar(jobID)
     workdir = self.directoryWrangler.getDone(jobID)
     shutil.move(jobdir, workdir)
+
+    callbackKeys = []
+    for jobList in self.watchedJobs.keys():
+      jobSet = jobList.split(',')
+      if set(jobSet).issubset(doneJobs):
+        callbackKeys.append(jobList)
+    
+    callbacks = []
+    for jobList in callbackKeys:
+      callbacks.append((self.watchedJobs[jobList], jobList))
+      del self.watchedJobs[jobList]
+      
+    # run callbacks
+    for callback in callbacks:
+      callback[0](callback[1].split(','))
 
   def runGraph(self, jobID, graphFile, restartFailed = False):
     runGraph = jobChomper.runGraph.RunGraph(self.directoryWrangler)
@@ -82,6 +103,10 @@ class Chomper(object):
         if future.done() is False:
           return True
     return False
+
+  def addCompletedCallback(self, jobids, callback):
+    jobStr = ','.join(jobids)
+    self.watchedJobs[jobStr] = callback
 
   def waitForAllComplete(self):    
     done, not_done = concurrent.futures.wait(self.runningSet.keys())
