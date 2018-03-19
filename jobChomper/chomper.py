@@ -1,4 +1,4 @@
-import os
+import os, shutil
 
 import concurrent.futures
 
@@ -29,7 +29,13 @@ class Chomper(object):
     self.workingDirectory = workingDirectory
     self.workTmp, self.workVar, self.workDone, self.logDir = createWorkDirs(self.workingDirectory)
     self.directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(self.workVar, self.workTmp, self.workDone)    
-    self.running = []
+
+    # set of running futures
+    # maps futures to job ID's
+    self.runningSet = {}
+    
+    # when completed, moved to done set
+    self.doneSet = {}
 
   def configureLogger(self):
     import logging
@@ -47,16 +53,38 @@ class Chomper(object):
   def getJobPath(self, jobID):
     return self.directoryWrangler.getVar(jobID)
 
+  def jobDone(self, future):
+    if future not in self.runningSet.keys():
+      raise ValueError("Recived job complete signal for job not in Chomper")
+    
+    jobID = self.runningSet[future]
+    self.doneSet[jobID] = future.result()
+    
+    # move job to done
+    self.doneSet[jobID].disableJournal()
+    jobdir = self.directoryWrangler.getVar(jobID)
+    workdir = self.directoryWrangler.getDone(jobID)
+    shutil.move(jobdir, workdir)
+
   def runGraph(self, jobID, graphFile, restartFailed = False):
     runGraph = jobChomper.runGraph.RunGraph(self.directoryWrangler)
-    runGraph.initFromGraph(graphFile, jobID)     
-    self.running.append(self.chomperPool.submit(runGraph.graphRun, restartFailed))     
-    #runGraph.graphRun(restartFailed)
-    #return runGraph.state
-    
-  def waitForComplete(self):
-    done, not_done = concurrent.futures.wait(self.running)
-    #print(done, not_done)
+    runGraph.initFromGraph(graphFile, jobID)
+    future = self.chomperPool.submit(runGraph.graphRun, restartFailed)
+    future.add_done_callback(self.jobDone)
+    self.runningSet[future] = jobID
+
+  def isRunning(self, jobIDs = None):
+    if jobIDs == None:
+      jobIDs = list(self.runningSet.values())
+    for future in self.runningSet.keys():
+      jid = self.runningSet[future]
+      if jid in jobIDs:
+        if future.done() is False:
+          return True
+    return False
+
+  def waitForAllComplete(self):    
+    done, not_done = concurrent.futures.wait(self.runningSet.keys())
     
     results = []
     

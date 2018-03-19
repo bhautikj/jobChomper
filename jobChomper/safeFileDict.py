@@ -25,7 +25,10 @@ class SafeFileDict(dict):  # dicts take a mapping or iterable as their optional 
       with open(self.journalFile, 'w') as file:
         file.write(data)
         logging.debug("Wrote dict to: " + self.journalFile)
-        
+  
+  def disableJournal(self):
+    self.writeJournal()
+    self.doJournal = False
 
   def readJournal(self, journalFile=""):
     if journalFile == "" and self.doJournal == False:
