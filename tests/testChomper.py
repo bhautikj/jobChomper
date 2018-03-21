@@ -69,7 +69,7 @@ class TestChomper(unittest.TestCase):
   def test_chomperMany(self):
     testBase = os.path.join(testdir, str(uuid.uuid4()))
     try:
-      chomper = jobChomper.chomper.Chomper(testBase, numWorkers=5)
+      chomper = jobChomper.chomper.Chomper(testBase)
 
       jobIDs = []
       for i in range(10):

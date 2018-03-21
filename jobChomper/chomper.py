@@ -25,11 +25,11 @@ class Chomper(object):
   
   """ RunGraph Object """
   def __init__(self, workingDirectory, numWorkers = 5):
-    chomperPool = concurrent.futures.ThreadPoolExecutor(numWorkers)
+    chomperPool = concurrent.futures.ThreadPoolExecutor(1)
     self.workingDirectory = workingDirectory
     self.workTmp, self.workVar, self.workDone, self.logDir = createWorkDirs(self.workingDirectory)
     self.directoryWrangler = jobChomper.directoryWrangler.DirectoryWrangler(self.workVar, self.workTmp, self.workDone)    
-
+    self.numWorkers = numWorkers
     # set of running futures
     # maps futures to job ID's
     self.runningSet = {}
@@ -88,7 +88,7 @@ class Chomper(object):
       callback[0](callback[1].split(','))
 
   def runGraph(self, jobID, graphFile, restartFailed = False):
-    runGraph = jobChomper.runGraph.RunGraph(self.directoryWrangler)
+    runGraph = jobChomper.runGraph.RunGraph(self.directoryWrangler, jobPoolSize = self.numWorkers)
     runGraph.initFromGraph(graphFile, jobID)
     future = self.chomperPool.submit(runGraph.graphRun, restartFailed)
     future.add_done_callback(self.jobDone)
